@@ -10,7 +10,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
@@ -49,10 +48,6 @@ public class LotteryController implements Initializable{
     private Label lblWins;
 
     private final FileChooser fileChooser = new FileChooser();
-//    private List<String> resultsList = new ArrayList<>();
-//    private List<String> betsList = new ArrayList<>();
-
-    public static Set<Set<Integer>> betSetList = new HashSet<>();
 
     private final String LOADED = "Loaded";
     private final String RESULTS = "result(s)";
@@ -65,12 +60,10 @@ public class LotteryController implements Initializable{
 
     @FXML
     void checkBets(MouseEvent event) {
-//        pb.setProgress(0);
-
         StringBuilder stringBuilder = new StringBuilder();
 
         for (Set<Integer> r : Results.getResultList()){
-            for(Set<Integer> b : betSetList) {
+            for(Set<Integer> b : Bets.getBetList()) {
 //                String[] bt = b.split(";");
                 for (Integer s : b) {
                     if (r.contains(s)) {
@@ -88,10 +81,9 @@ public class LotteryController implements Initializable{
 
     @FXML
     void loadBets(MouseEvent event) {
-
         lstViewBets.getItems().clear();
 
-        File file = getFile(BETS);
+        File file = FilesUtils.getFile(BETS);
 
         LoadBets loadBets = new LoadBets(file, lstViewBets);
         loadBets.valueProperty().addListener(new ChangeListener<Long>() {
@@ -99,7 +91,6 @@ public class LotteryController implements Initializable{
             public void changed(ObservableValue<? extends Long> observableValue, Long aLong, Long t1) {
                 lblBets.setText(LOADED + " " + t1 + " " + BETS);
                 lstViewBets.scrollTo(lstViewBets.getItems().size()-1);
-//                betsList = lstBets.getItems();
             }
         });
 
@@ -113,23 +104,17 @@ public class LotteryController implements Initializable{
 
     @FXML
     void loadResults(MouseEvent event)  {
-
         lstViewResults.getItems().clear();
 
-        File file = getFile(RESULTS);
+        File file = FilesUtils.getFile(RESULTS);
 
         LoadResults loadResults = new LoadResults(file, lstViewResults);
-/*        loadResults.call(getFile(RESULTS));
-
-        lblResults.setText(LOADED + " " + Results.getResultList().size() + " " + RESULTS);
-        lstViewResults.scrollTo(lstViewResults.getItems().size()-1);*/
 
         loadResults.valueProperty().addListener(new ChangeListener<Long>() {
             @Override
             public void changed(ObservableValue<? extends Long> observableValue, Long aLong, Long t1) {
                 lblResults.setText(LOADED + " " + t1 + " " + RESULTS);
                 lstViewResults.scrollTo(lstViewResults.getItems().size()-1);
-//                betsList = lstBets.getItems();
             }
         });
 
@@ -139,66 +124,7 @@ public class LotteryController implements Initializable{
         thread.setDaemon(true);
         thread.start();
 
-
     }
-
-    private File getFile(String type){
-        fileChooser.setTitle("Choose " + type);
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("CSV file", "*.csv"),
-                new FileChooser.ExtensionFilter("Text file", "*.txt"),
-                new FileChooser.ExtensionFilter("DIC file", "*.dic"),
-                new FileChooser.ExtensionFilter("All files", "*.*"));
-        File file = fileChooser.showOpenDialog(new Stage());
-//        String filePath = file.getAbsolutePath();
-        return file;
-    }
-
-/*
-    private class LoadBets extends Task<Long> {
-
-        File file;
-
-        public LoadBets(File file){
-            this.file = file;
-        }
-
-        @Override
-        protected Long call() throws Exception {
-            long i = 0;
-            Scanner scanner = null;
-            try {
-                scanner = new Scanner(file);
-                while (scanner.hasNextLine()){
-                    String r = scanner.nextLine();
-
-//                    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(12), new EventHandler<ActionEvent>() {
-//                        private long i = 1;
-//                        @Override
-//                        public void handle(ActionEvent event) {
-
-                            lstViewBets.getItems().add(r);
-                            betSetList.add(Arrays.stream(r.split(";")).map(Integer::parseInt).collect(Collectors.toSet()));
-                            updateProgress(i, 3);
-                            updateValue(i);
-
-//                        }
-//                    }));
-//                    timeline.play();
-//                    Thread.sleep(150);
-//                    lstBets.getItems().add(r);
-//                    updateProgress(i, 3);
-//                    updateValue(i);
-                    i++;
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            return i;
-        }
-
-    }
-*/
 
 
 }

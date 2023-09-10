@@ -1,4 +1,4 @@
-package com.marcelo.lotteryfx;
+package com.marcelo.lotteryfx.models;
 
 import java.util.HashSet;
 import java.util.Set;

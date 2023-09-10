@@ -12,4 +12,10 @@ module com.marcelo.megasenafx {
 
     opens com.marcelo.lotteryfx to javafx.fxml;
     exports com.marcelo.lotteryfx;
+    exports com.marcelo.lotteryfx.models;
+    opens com.marcelo.lotteryfx.models to javafx.fxml;
+    exports com.marcelo.lotteryfx.tasks;
+    opens com.marcelo.lotteryfx.tasks to javafx.fxml;
+    exports com.marcelo.lotteryfx.utils;
+    opens com.marcelo.lotteryfx.utils to javafx.fxml;
 }

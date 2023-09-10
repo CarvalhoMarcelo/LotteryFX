@@ -1,5 +1,9 @@
 package com.marcelo.lotteryfx;
 
+import com.marcelo.lotteryfx.models.Bets;
+import com.marcelo.lotteryfx.models.Results;
+import com.marcelo.lotteryfx.tasks.LoadFile;
+import com.marcelo.lotteryfx.utils.FilesUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -55,7 +59,7 @@ public class LotteryController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        fileChooser.setInitialDirectory(new File("G:\\MARCELO\\Programacao\\Cursos_Testes\\Java\\MegaSena"));
+        fileChooser.setInitialDirectory(FilesUtils.setInitialDirectory());
     }
 
     @FXML
@@ -81,49 +85,35 @@ public class LotteryController implements Initializable{
 
     @FXML
     void loadBets(MouseEvent event) {
-        lstViewBets.getItems().clear();
-
-        File file = FilesUtils.getFile(BETS);
-
-        LoadBets loadBets = new LoadBets(file, lstViewBets);
-        loadBets.valueProperty().addListener(new ChangeListener<Long>() {
-            @Override
-            public void changed(ObservableValue<? extends Long> observableValue, Long aLong, Long t1) {
-                lblBets.setText(LOADED + " " + t1 + " " + BETS);
-                lstViewBets.scrollTo(lstViewBets.getItems().size()-1);
-            }
-        });
-
-        pb.progressProperty().bind(loadBets.progressProperty());
-
-        Thread thread = new Thread(loadBets);
-        thread.setDaemon(true);
-        thread.start();
-
+        loadFile(BETS, lstViewBets, lblBets);
     }
 
     @FXML
     void loadResults(MouseEvent event)  {
-        lstViewResults.getItems().clear();
+        loadFile(RESULTS, lstViewResults, lblResults);
+    }
 
-        File file = FilesUtils.getFile(RESULTS);
+    private void loadFile(String type, ListView<String> lstView, Label lbl){
 
-        LoadResults loadResults = new LoadResults(file, lstViewResults);
+        lstView.getItems().clear();
+        File file = FilesUtils.getFile(type, fileChooser);
 
-        loadResults.valueProperty().addListener(new ChangeListener<Long>() {
-            @Override
-            public void changed(ObservableValue<? extends Long> observableValue, Long aLong, Long t1) {
-                lblResults.setText(LOADED + " " + t1 + " " + RESULTS);
-                lstViewResults.scrollTo(lstViewResults.getItems().size()-1);
-            }
-        });
+        if(Objects.nonNull(file)){
+            LoadFile loadFile = new LoadFile(file, lstView, type);
+            loadFile.valueProperty().addListener(new ChangeListener<Long>() {
+                @Override
+                public void changed(ObservableValue<? extends Long> observableValue, Long aLong, Long t1) {
+                    lbl.setText(LOADED + " " + t1 + " " + type);
+                    lstView.scrollTo(lstViewBets.getItems().size()-1);
+                }
+            });
 
-        pb.progressProperty().bind(loadResults.progressProperty());
+            pb.progressProperty().bind(loadFile.progressProperty());
 
-        Thread thread = new Thread(loadResults);
-        thread.setDaemon(true);
-        thread.start();
-
+            Thread thread = new Thread(loadFile);
+            thread.setDaemon(true);
+            thread.start();
+        }
     }
 
 

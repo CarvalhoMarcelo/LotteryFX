@@ -65,16 +65,26 @@ public class LotteryController implements Initializable{
     @FXML
     void checkBets(MouseEvent event) {
         StringBuilder stringBuilder = new StringBuilder();
+        int game = 0;
+
 
         for (Set<Integer> r : Results.getResultList()){
+            game++;
+            int bet = 0;
             for(Set<Integer> b : Bets.getBetList()) {
+                bet++;
+                stringBuilder.append("You bet nr: " + bet + " - ");
+                int cont = 0;
 //                String[] bt = b.split(";");
                 for (Integer s : b) {
                     if (r.contains(s)) {
-                        stringBuilder.append(s);
+                        cont++;
+                        stringBuilder.append(String.format("%02d",s));
+                        stringBuilder.append(";");
                     }
                 }
-                if(stringBuilder.length()/2 >= 4){
+                if(cont >= 4){
+                    stringBuilder.append(" - at Game nr " + game);
                     lstViewCheck.getItems().add(stringBuilder.toString());
                 }
                 stringBuilder.delete(0, stringBuilder.length());

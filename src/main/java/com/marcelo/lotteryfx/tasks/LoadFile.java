@@ -42,6 +42,7 @@ public class LoadFile extends Task<Long> {
     protected Long call() throws Exception {
 
         long i = 0;
+        int cont = 0;
 
         try {
             Scanner scanner = new Scanner(file);
@@ -51,16 +52,14 @@ public class LoadFile extends Task<Long> {
             while (scanner.hasNextLine()){
                 String line = scanner.nextLine();
                 String[] list = line.split(";");
-                String[] newList = new String[list.length];
-                for(int x = 0; x < list.length; x++) {
-                    newList[x] = list[x].replaceAll("[^0-9]", "");
-                }
+                Arrays.setAll(list, x -> list[x].replaceAll("[^0-9]", ""));
+
                 if(isResult(type)){
-                    lstViewResults.getItems().add(line);
-                    Results.setResultList(getList(newList));
+                    lstViewResults.getItems().add(String.format("%04d", ++cont) + " - " + line);
+                    Results.setResultList(getList(list));
                 } else {
-                    lstViewBets.getItems().add(line);
-                    Bets.setBetList(getList(newList));
+                    lstViewBets.getItems().add(String.format("%04d", ++cont) + " - " + line);
+                    Bets.setBetList(getList(list));
 
                 }
 

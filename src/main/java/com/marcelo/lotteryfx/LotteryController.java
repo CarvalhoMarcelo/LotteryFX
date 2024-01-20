@@ -1,5 +1,6 @@
 package com.marcelo.lotteryfx;
 
+import com.marcelo.lotteryfx.exceptions.CustomExceptions;
 import com.marcelo.lotteryfx.models.Bets;
 import com.marcelo.lotteryfx.models.Results;
 import com.marcelo.lotteryfx.tasks.LoadFile;
@@ -8,16 +9,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 public class LotteryController implements Initializable{
 
@@ -51,6 +50,9 @@ public class LotteryController implements Initializable{
     @FXML
     private Label lblWins;
 
+    @FXML
+    private TextField txtamount;
+
     private final FileChooser fileChooser = new FileChooser();
 
     private final String LOADED = "Loaded";
@@ -60,37 +62,54 @@ public class LotteryController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         fileChooser.setInitialDirectory(FilesUtils.setInitialDirectory());
+
+        txtamount.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    txtamount.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+
     }
 
     @FXML
     void checkBets(MouseEvent event) {
         StringBuilder stringBuilder = new StringBuilder();
+        lstViewCheck.getItems().clear();
         int game = 0;
 
-
-        for (Set<Integer> r : Results.getResultList()){
-            game++;
-            int bet = 0;
-            for(Set<Integer> b : Bets.getBetList()) {
-                bet++;
-                stringBuilder.append("You bet nr: " + bet + " - ");
-                int cont = 0;
+        if(txtamount.getText().isEmpty() || txtamount.getText().isBlank() || Integer.parseInt(txtamount.getText()) <= 0) {
+            CustomExceptions.showExceptionDialog();
+        } else {
+            for (Set<Integer> r : Results.getResultList()) {
+                game++;
+                int bet = 0;
+                for (Set<Integer> b : Bets.getBetList()) {
+                    bet++;
+                    stringBuilder.append("You bet nr: " + bet + " - ");
+                    int cont = 0;
 //                String[] bt = b.split(";");
-                for (Integer s : b) {
-                    if (r.contains(s)) {
-                        cont++;
-                        stringBuilder.append(String.format("%02d",s));
-                        stringBuilder.append(";");
+                    for (Integer s : b) {
+                        if (r.contains(s)) {
+                            cont++;
+                            stringBuilder.append(String.format("%02d", s));
+                            stringBuilder.append(";");
+                        }
                     }
+                    if (cont >= Integer.parseInt(txtamount.getText())) {
+                        stringBuilder.append(" - at Game nr " + game);
+                        lstViewCheck.getItems().add(stringBuilder.toString());
+                    }
+                    stringBuilder.delete(0, stringBuilder.length());
                 }
-                if(cont >= 4){
-                    stringBuilder.append(" - at Game nr " + game);
-                    lstViewCheck.getItems().add(stringBuilder.toString());
-                }
-                stringBuilder.delete(0, stringBuilder.length());
-            };
-        };
-        lblWins.setText("Youn win(s) " + " " + lstViewCheck.getItems().size() + " " + BETS);
+                ;
+            }
+            ;
+            lblWins.setText("Youn win(s) " + " " + lstViewCheck.getItems().size() + " " + BETS);
+        }
     }
 
     @FXML

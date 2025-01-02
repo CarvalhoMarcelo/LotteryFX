@@ -7,7 +7,8 @@ import java.io.File;
 
 public class FilesUtils {
 
-    private static final String DIRECTORY = "G:\\MARCELO\\Programacao\\Cursos_Testes\\Java\\MegaSena";
+//    private static final String DIRECTORY = "G:\\MARCELO\\Programacao\\Cursos_Testes\\Java\\MegaSena";
+    private static final String DIRECTORY = "/mnt/ntfs/MARCELO/Programacao/Cursos_Testes/Java/MegaSena/";
     private static final String USER_HOME = "user.home";
 
     public static File getFile(String type, FileChooser fileChooser){
